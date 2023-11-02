@@ -8,9 +8,9 @@ int main() {
     printf("4.Mot de passe\n");
     printf("5.Scores\n");
     printf("6.Quitter\n");
-   
-    int CHOIX,a;
-    CHOIX = choix (a);
 
-     return 0;
+    int CHOIX,a;
+    CHOIX = choix(a);
+
+    return 0;
 }
