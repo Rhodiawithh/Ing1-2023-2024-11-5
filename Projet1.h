@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 
-int choi(int option);
+int choix(int option);
 
 
 
