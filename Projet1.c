@@ -6,8 +6,6 @@
 int choix(int option){
     printf("taper un entier entre 1 et 5:");
     scanf("%d", &option);
-    printf("taper un entier entre 1 et 5:");
-    scanf("%d", &option);
     
     return option;
 }
