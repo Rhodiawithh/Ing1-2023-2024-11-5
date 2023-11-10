@@ -10,13 +10,4 @@
 int choix(int option);
 
 
-
-
-
-
-
-
-
-
-
 #endif //ING1_2023_2024_11_5_PROJET1_H
