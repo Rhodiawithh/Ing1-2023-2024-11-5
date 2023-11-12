@@ -1,7 +1,9 @@
 #include "Projet1.h"
 
 int main() {
-    printf("MENU:\n");
+    Color(3,0);
+    printf("\tMENU:\n");
+    Color(15,0);
     printf("1.Regles du jeu\n");
     printf("2.Lancer un nouveau Jeu a partir du niveau 1\n");
     printf("3.Charger une partie\n");
