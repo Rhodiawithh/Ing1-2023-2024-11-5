@@ -1,0 +1,3 @@
+C:/TetS/cmake-build-debug/CMakeFiles/TetS.dir
+C:/TetS/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/TetS/cmake-build-debug/CMakeFiles/rebuild_cache.dir
