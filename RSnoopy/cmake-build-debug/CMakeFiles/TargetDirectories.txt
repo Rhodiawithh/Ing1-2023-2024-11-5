@@ -1,3 +1,0 @@
-C:/RSnoopy/cmake-build-debug/CMakeFiles/RSnoopy.dir
-C:/RSnoopy/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/RSnoopy/cmake-build-debug/CMakeFiles/rebuild_cache.dir
