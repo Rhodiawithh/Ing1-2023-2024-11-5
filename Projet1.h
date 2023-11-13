@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <Windows.h>
 int choix(int option);
 int ChargerNiveau();
 int quitter(int );
