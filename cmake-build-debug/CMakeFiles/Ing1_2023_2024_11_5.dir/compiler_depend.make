@@ -280,7 +280,9 @@ CMakeFiles/Ing1_2023_2024_11_5.dir/Projet1.c.obj: C:/Users/loris/OneDrive/Docume
   C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/sec_api/stralign_s.h \
   C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/winsvc.h \
   C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/mcx.h \
-  C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/imm.h
+  C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/imm.h \
+  C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/conio.h \
+  C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/sec_api/conio_s.h
 
 CMakeFiles/Ing1_2023_2024_11_5.dir/main.c.obj: C:/Users/loris/OneDrive/Documents/GitHub/Ing1-2023-2024-11-5/main.c \
   C:/Users/loris/OneDrive/Documents/GitHub/Ing1-2023-2024-11-5/Projet1.h \
@@ -561,7 +563,9 @@ CMakeFiles/Ing1_2023_2024_11_5.dir/main.c.obj: C:/Users/loris/OneDrive/Documents
   C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/sec_api/stralign_s.h \
   C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/winsvc.h \
   C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/mcx.h \
-  C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/imm.h
+  C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/imm.h \
+  C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/conio.h \
+  C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/sec_api/conio_s.h
 
 
 C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/wnnc.h:
@@ -1088,6 +1092,8 @@ C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include
 
 C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/objidlbase.h:
 
+C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/conio.h:
+
 C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/cguid.h:
 
 C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/unknwn.h:
@@ -1115,3 +1121,5 @@ C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include
 C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/stralign.h:
 
 C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/sec_api/stralign_s.h:
+
+C:/Program\ Files/JetBrains/CLion\ 2023.2.1/bin/mingw/x86_64-w64-mingw32/include/sec_api/conio_s.h:
