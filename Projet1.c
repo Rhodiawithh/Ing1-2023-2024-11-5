@@ -2,12 +2,12 @@
 // Created by chano on 01/11/2023.
 //
 #include "Projet1.h"
-
-int T=120;
 int TRestant = 120;
 int option;
 int niveau;
 int vies = 3;
+double elapsed_time = 0;
+
 void menu()
 {
 
@@ -29,7 +29,7 @@ void menu()
     printf("                                              1.Regles du jeu\n");
     printf("                                              2.Lancer un nouveau Jeu a partir du niveau 1\n");
     printf("                                              3.Charger une partie\n");
-    printf("                                              4.Mot de passe\n");
+    printf("                                              4.Instructions Jeu\n");
     printf("                                              5.Scores\n");
     printf("                                              6.Quitter\n");
 
@@ -55,8 +55,6 @@ int choix1(JEU* jeu, int niveau)
         else if (CHOIX == 2)
         {
             int niveau = ChargerNiveau1();
-            char MDP[20];
-            MotsDePasses(MDP, niveau);
             initialisation_plateau(&jeu);
             lancerPartie1(&jeu);
             SCORES(&jeu, niveau, elapsed_time);
@@ -84,16 +82,17 @@ int choix1(JEU* jeu, int niveau)
         {
             SCORES(&jeu, niveau, elapsed_time);
         }
+        else if (CHOIX == 4)
+        {
+            printf("Touches du jeu:-Appuyer 'D' pour aller en bas;"
+                                         "-Appuyer 'Q' pour ller en Haut;"
+                                         "-Appuyer 'S' pour aller a gauche;"
+                                         "-Appuyer 'Z' pour aller a droite;"
+                                         "-Appuyer 'P' a tout moment pour mettre pause                                                      ");
+        }
 
     }
 
-}
-void clearreen() {
-    system("cls");
-}
-void Color(int couleurDuTexte, int couleurDeFond) {
-    HANDLE H = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(H, couleurDeFond * 16 + couleurDuTexte);
 }
 int ChargerNiveau1() {
     int niveau = 1;
@@ -106,7 +105,7 @@ int ChargerNiveau1() {
 }
 int ChargerNiveau2() {
     int niveau = 2;
-    FILE* fichier = fopen("sauvegarde.txt", "r");
+    FILE* fichier = fopen("sauvegarde2.txt", "r");
     if (fichier != NULL) {
         fscanf(fichier, "%d", &niveau);
         fclose(fichier);
@@ -199,20 +198,11 @@ void chargerMeilleursScores(JEU* jeu) {
         fclose(fichier);
     }
 }
-void chronometre(int seconds) {
-    sauvegarderTempsRestant(TRestant);
-    for (seconds = TRestant; seconds >= 0; seconds--) {
-        printf("\rTemps restant : %d secondes   ", seconds);
-        fflush(stdout);
-        Sleep(1000);
-    }
-    printf("\nDEATH\n");
-}
-double elapsed_time = 0;
 void afficherTempsRestant(int tempsRestant) {
     printf("Temps restant : %d secondes", tempsRestant);
 }
-void initialisation_plateau(JEU* jeu) {
+void initialisation_plateau(JEU* jeu)
+{
     int i, j;
     jeu->snoopy_x = LIGNES_PLATEAU / 2;
     jeu->snoopy_y = COLONNES_PLATEAU / 2;
@@ -235,14 +225,6 @@ void initialisation_plateau(JEU* jeu) {
         }
     }
 }
-void affichage_plateau(JEU* jeu) {
-    for (int i = 0; i < LIGNES_PLATEAU; i++) {
-        for (int j = 0; j < COLONNES_PLATEAU; j++) {
-            printf("%c", jeu->plateau[i][j]);
-        }
-        printf("\n");
-    }
-}
 void deplacement(JEU* jeu, int deplacement_x, int deplacement_y) {
     int x = jeu->snoopy_x + deplacement_x;
     int y = jeu->snoopy_y + deplacement_y;
@@ -259,6 +241,118 @@ void deplacement(JEU* jeu, int deplacement_x, int deplacement_y) {
         jeu->snoopy_x = x;
         jeu->snoopy_y = y;
         jeu->plateau[jeu->snoopy_x][jeu->snoopy_y] = SNOOPY;
+    }
+}
+void initialisation_plateau2(JEU* jeu) {
+    int i, j;
+    jeu->snoopy_x = LIGNES_PLATEAU / 2;
+    jeu->snoopy_y = COLONNES_PLATEAU / 2;
+    jeu->oiseau = 4;
+    jeu->point = 0;
+
+    // Réinitialisation du plateau
+    for (i = 0; i < LIGNES_PLATEAU; i++) {
+        for (j = 0; j < COLONNES_PLATEAU; j++) {
+
+            if ((i == 1 && j == 1) || (i == 1 && j == COLONNES_PLATEAU - 2) ||
+                (i == LIGNES_PLATEAU - 2 && j == 1) || (i == LIGNES_PLATEAU - 2 && j == COLONNES_PLATEAU - 2)) {
+                jeu->plateau[i][j] = 0x0;  // Supprime les anciens emplacements d'oiseaux
+            } else if (i == 0 || j == 0 || i == LIGNES_PLATEAU - 1 || j == COLONNES_PLATEAU - 1) {
+                jeu->plateau[i][j] = DELIMITATION;
+            } else if (i == jeu->snoopy_x && j == jeu->snoopy_y) {
+                jeu->plateau[jeu->snoopy_x][jeu->snoopy_y] = SNOOPY;
+            } else {
+                jeu->plateau[i][j] = 0x0;
+            }
+        }
+    }
+    srand((unsigned)time(NULL));
+
+    // Remplit le plateau avec des murs
+    for (int i = 0; i < LIGNES_PLATEAU; i++) {
+        for (int j = 0; j < COLONNES_PLATEAU; j++) {
+            jeu->plateau[i][j] = MUR;
+        }
+    }
+    srand((unsigned)time(NULL));
+
+    // Remplit le plateau avec des murs
+    for (int i = 0; i < LIGNES_PLATEAU; i++) {
+        for (int j = 0; j < COLONNES_PLATEAU; j++) {
+            jeu->plateau[i][j] = MUR;
+        }
+    }
+
+    // Crée un point de départ et ajoute-le au labyrinthe
+    int startX = 1;
+    int startY = 1;
+    jeu->plateau[startX][startY] = PASSAGE;
+
+    // Génère le labyrinthe en utilisant une méthode simple de creusement aléatoire
+    for (int i = 0; i < 1000; i++) {
+        int direction = rand() % 4; // Choix aléatoire d'une direction (0: haut, 1: droite, 2: bas, 3: gauche)
+
+        switch (direction) {
+            case 0: // Haut
+                if (startX - 2 > 0) {
+                    jeu->plateau[startX - 2][startY] = PASSAGE;
+                    jeu->plateau[startX - 1][startY] = PASSAGE;
+                    startX -= 2;
+                }
+                break;
+            case 1: // Droite
+                if (startY + 2 < COLONNES_PLATEAU - 1) {
+                    jeu->plateau[startX][startY + 2] = PASSAGE;
+                    jeu->plateau[startX][startY + 1] = PASSAGE;
+                    startY += 2;
+                }
+                break;
+            case 2: // Bas
+                if (startX + 2 < LIGNES_PLATEAU - 1) {
+                    jeu->plateau[startX + 2][startY] = PASSAGE;
+                    jeu->plateau[startX + 1][startY] = PASSAGE;
+                    startX += 2;
+                }
+                break;
+            case 3: // Gauche
+                if (startY - 2 > 0) {
+                    jeu->plateau[startX][startY - 2] = PASSAGE;
+                    jeu->plateau[startX][startY - 1] = PASSAGE;
+                    startY -= 2;
+                }
+                break;
+        }
+    }
+    // Place les oiseaux à de nouveaux emplacements
+    jeu->plateau[2][2] = OISEAU;
+    jeu->plateau[2][COLONNES_PLATEAU - 3] = OISEAU;
+    jeu->plateau[LIGNES_PLATEAU - 3][2] = OISEAU;
+    jeu->plateau[LIGNES_PLATEAU - 3][COLONNES_PLATEAU - 3] = OISEAU;
+}
+void deplacement2(JEU* jeu, int deplacement_x, int deplacement_y) {
+    int x = jeu->snoopy_x + deplacement_x;
+    int y = jeu->snoopy_y + deplacement_y;
+
+    if (x >= 0 && x < LIGNES_PLATEAU && y >= 0 && y < COLONNES_PLATEAU && jeu->plateau[x][y] != MUR) {
+        if (jeu->plateau[x][y] == OISEAU) {
+            jeu->oiseau--;
+            if (jeu->oiseau == 0) {
+                jeu->point = 1;
+                return;
+            }
+        }
+        jeu->plateau[jeu->snoopy_x][jeu->snoopy_y] = PASSAGE;  // Utilisez le code pour le passage au lieu de 0x0
+        jeu->snoopy_x = x;
+        jeu->snoopy_y = y;
+        jeu->plateau[jeu->snoopy_x][jeu->snoopy_y] = SNOOPY;
+    }
+}
+void affichage_plateau(JEU* jeu) {
+    for (int i = 0; i < LIGNES_PLATEAU; i++) {
+        for (int j = 0; j < COLONNES_PLATEAU; j++) {
+            printf("%c", jeu->plateau[i][j]);
+        }
+        printf("\n");
     }
 }
 void reinitialiserPositionSnoopy(JEU* jeu) {
@@ -325,102 +419,267 @@ void lancement1()
         }
     }
 }
-
-
-void lancerPartie1(JEU* jeu) {
-    int niveau = ChargerNiveau1();
+void lancerPartie2(JEU* jeu)
+{
     clock_t start_time = clock();
+    bool prochainNiveau = false;
     int tempsLimite = 120;
-    int vies = 3;
-
-    lancement1();
-
-    affichage_plateau(jeu);
-    fflush(stdout);
-    printf("\nLe jeu commence!\n");
-
-    while (1) {
-        int seconds;
+    MotsDePasses(jeu->motDePasse, 2);
+    if (verificationMotDePasse(jeu->motDePasse, 2))
+    {
+        lancement();
+        affichage_plateau(jeu);
+        fflush(stdout);
+        printf("\nLe jeu commence!\n");
+        lancement();
 
         while (1) {
-            char mvmt = getch();
-            int deplacement_x = 0, deplacement_y = 0;
+            int seconds;
 
-            switch (mvmt)
-            {
-                case 's':
-                    deplacement_x = 0;
-                    deplacement_y = -1;
-                    break;
-                case 'z':
-                    deplacement_x = 0;
-                    deplacement_y = 1;
-                    break;
-                case 'd':
-                    deplacement_x = 1;
-                    deplacement_y = 0;
-                    break;
-                case 'q':
-                    deplacement_x = -1;
-                    deplacement_y = 0;
-                    break;
-                case 'l':
-                    printf("Vous avez quitté le jeu\n");
-                    SCORES(&jeu, niveau, elapsed_time); // Affichage des scores
-                    return;
-            }
+            while (1) {
+                char mvmt = getch();
+                int deplacement_x = 0, deplacement_y = 0;
 
-            deplacement(jeu, deplacement_x, deplacement_y);
+                switch (mvmt) {
+                    case 's':
+                        deplacement_x = 0;
+                        deplacement_y = -1;
+                        break;
+                    case 'z':
+                        deplacement_x = 0;
+                        deplacement_y = 1;
+                        break;
+                    case 'd':
+                        deplacement_x = 1;
+                        deplacement_y = 0;
+                        break;
+                    case 'q':
+                        deplacement_x = -1;
+                        deplacement_y = 0;
+                        break;
+                    case 'l':
+                        printf("Vous avez quitté le jeu\n");
+                        SCORES(jeu, 2, elapsed_time); // 2 pour le deuxième niveau
+                        return;
+                }
 
-            if (jeu->plateau[jeu->snoopy_x][jeu->snoopy_y] == OISEAU) {
-                jeu->oiseau--;
-                if (jeu->oiseau == 0) {
-                    jeu->point = 1;
-                    printf("Vous avez collecté tous les oiseaux! Vous passez au niveau suivant.\n");
+                deplacement2(jeu, deplacement_x, deplacement_y);
+                if (jeu->plateau[jeu->snoopy_x][jeu->snoopy_y] == OISEAU) {
+                    jeu->oiseau--;
+                    if (jeu->oiseau == 0) {
+                        jeu->point = 1;
+                        printf("Vous avez collecté tous les oiseaux! Vous passez au niveau suivant.\n");
+                        clock_t current_time = clock();
+                        double elapsed_time = (double) (current_time - start_time) / CLOCKS_PER_SEC;
+                        int ScoreNiveau = tempsLimite - (int) elapsed_time * 100;
+                        jeu->scores[niveau - 1] = ScoreNiveau;
+                        // Affichage des scores
+                        SCORES(jeu, niveau, elapsed_time);
+                        // Sauvegarde des meilleurs scores
+                        sauvegarderMeilleursScores(jeu, niveau);
+
+                        break;
+                    }
+                }
+
+                affichage_plateau(jeu);
+                fflush(stdout);
+
+                if (jeu->point == 1) //si tous les oiseaux récupérés
+                {
+                    printf("Victoire! Vous avez termine le deuxième niveau.\n");
                     clock_t current_time = clock();
-                    double elapsed_time = (double)(current_time - start_time) / CLOCKS_PER_SEC;
-                    int ScoreNiveau = tempsLimite - (int)elapsed_time * 100;
+                    double elapsed_time = (double) (current_time - start_time) / CLOCKS_PER_SEC;
+                    int ScoreNiveau = tempsLimite - (int) elapsed_time * 100;
+                    jeu->scores[1] = ScoreNiveau; // Mise à jour du score du deuxième niveau
+                    // Affichage des scores
+                    SCORES(jeu, 2, elapsed_time);
+                    // Sauvegarde des meilleurs scores
+                    sauvegarderMeilleursScores(jeu, 2);
+                    printf("Que souhaitez vous faire\n");
+                    printf("1. Retourner au menu principal\n");
+                    printf("2. Passer au niveau suivant\n");
+                    int choi;
+                    scanf("%d", &choi);
+
+                    if (choi == 2)
+                    {
+                        prochainNiveau = true;
+                        break;
+                    } else if (choi == 1)
+                    {
+                        lancement1();
+                        menu();
+                        choix1(jeu, option);
+                        choix(option);
+                        break;
+                    } else {
+                        printf("Choix invalide. Veuillez choisir 1 ou 2.\n");
+                    }
+
+                }
+
+
+                clock_t current_time = clock();
+                double elapsed_time = (double) (current_time - start_time) / CLOCKS_PER_SEC;
+
+                if (elapsed_time > tempsLimite) //Si temps écoulé--> game over
+                {
+                    VIES(jeu);
+                    lancement();
+                    start_time = clock();
+                    break;
+                }
+
+                seconds = tempsLimite - (int) elapsed_time;
+                printf("\rTemps restant : %d secondes   ", seconds);
+                fflush(stdout);
+            }
+        }
+    }
+    else
+    {
+            printf("Mot de passe incorrect. Retour au menu principal.\n");
+            choix(option);
+    }
+}
+void lancerPartie1(JEU *jeu)
+{
+    int niveau = ChargerNiveau1();
+    clock_t start_time = clock();
+    bool prochainNiveau = false;
+    int tempsLimite = 120;
+    int vies = 3;
+    MotsDePasses(jeu->motDePasse, 1);
+    if (verificationMotDePasse(jeu->motDePasse, 1)) {
+        lancement();
+        affichage_plateau(jeu);
+        fflush(stdout);
+        printf("\nLe jeu commence!\n");
+
+        while (1) {
+            int seconds;
+
+            while (1) {
+                char mvmt = getch();
+                int deplacement_x = 0, deplacement_y = 0;
+
+                switch (mvmt) {
+                    case 's':
+                        deplacement_x = 0;
+                        deplacement_y = -1;
+                        break;
+                    case 'z':
+                        deplacement_x = 0;
+                        deplacement_y = 1;
+                        break;
+                    case 'd':
+                        deplacement_x = 1;
+                        deplacement_y = 0;
+                        break;
+                    case 'q':
+                        deplacement_x = -1;
+                        deplacement_y = 0;
+                        break;
+                    case 'l':
+                        printf("Vous avez quitté le jeu\n");
+                        SCORES(&jeu, niveau, elapsed_time); // Affichage des scores
+                        return;
+                }
+
+                deplacement(jeu, deplacement_x, deplacement_y);
+////////////////////////////////////////////////////////////////////////////////////////////
+
+
+                if (jeu->plateau[jeu->snoopy_x][jeu->snoopy_y] == OISEAU) {
+                    jeu->oiseau--;
+                    if (jeu->oiseau == 0) {
+                        jeu->point = 1;
+                        printf("Vous avez collecté tous les oiseaux! Vous passez au niveau suivant.\n");
+                        clock_t current_time = clock();
+                        double elapsed_time = (double) (current_time - start_time) / CLOCKS_PER_SEC;
+                        int ScoreNiveau = tempsLimite - (int) elapsed_time * 100;
+                        jeu->scores[niveau - 1] = ScoreNiveau;
+                        // Affichage des scores
+                        SCORES(jeu, niveau, elapsed_time);
+                        // Sauvegarde des meilleurs scores
+                        sauvegarderMeilleursScores(jeu, niveau);
+
+                        break;
+                    }
+                }
+
+                affichage_plateau(jeu);
+                fflush(stdout);
+
+                if (jeu->point == 1) //si tous les oiseaux récupérés
+                {
+                    printf("Victoire! Vous passez au niveau suivant.\n");
+                    clock_t current_time = clock();
+                    double elapsed_time = (double) (current_time - start_time) / CLOCKS_PER_SEC;
+                    int ScoreNiveau = tempsLimite - (int) elapsed_time * 100;
                     jeu->scores[niveau - 1] = ScoreNiveau;
                     // Affichage des scores
                     SCORES(jeu, niveau, elapsed_time);
                     // Sauvegarde des meilleurs scores
                     sauvegarderMeilleursScores(jeu, niveau);
+                    printf("Que souhaitez vous faire\n");
+                    printf("1. Retourner au menu principal\n");
+                    printf("2. Passer au niveau suivant\n");
+                    int choi;
+                    scanf("%d", &choi);
 
+                    if (choi == 2) {
+                        prochainNiveau = true;
+                        break;
+                    } else if (choi == 1) {
+                        lancement1();
+                        menu();
+                        choix1(jeu, option);
+                        choix(option);
+                        break; // Retourner au menu principal
+                    } else {
+                        printf("Choix invalide. Veuillez choisir 1 ou 2.\n");
+                    }
+                    // break;
+                }
+
+                clock_t current_time = clock();
+                double elapsed_time = (double) (current_time - start_time) / CLOCKS_PER_SEC;
+
+                if (elapsed_time > tempsLimite) //Si temps écoulé--> game over
+                {
+                    VIES(jeu);
+                    lancement();
+                    start_time = clock();
                     break;
                 }
+
+                seconds = tempsLimite - (int) elapsed_time;
+                printf("\rTemps restant : %d secondes   ", seconds);
+                fflush(stdout);
             }
+            if (prochainNiveau) {
 
-            affichage_plateau(jeu);
-            fflush(stdout);
-
-            if (jeu->point == 1) //si tous les oiseaux récupérés
-            {
-                printf("Victoire! Vous passez au niveau suivant.\n");
-                clock_t current_time = clock();
-                double elapsed_time = (double)(current_time - start_time) / CLOCKS_PER_SEC;
-                int ScoreNiveau = tempsLimite - (int)elapsed_time * 100;
-                jeu->scores[niveau - 1] = ScoreNiveau;
-                // Affichage des scores
-                SCORES(jeu, niveau, elapsed_time);
-                // Sauvegarde des meilleurs scores
-                sauvegarderMeilleursScores(jeu, niveau);
-                break;
-            }
-
-            clock_t current_time = clock();
-            double elapsed_time = (double)(current_time - start_time) / CLOCKS_PER_SEC;
-
-            if (elapsed_time > tempsLimite) //Si temps écoulé--> game over
-            {
-                VIES(jeu);
+                int niveau2 = ChargerNiveau2();
+                initialisation_plateau2(jeu);
                 lancement();
-                start_time = clock();
+                lancerPartie2(jeu);
                 break;
-            }
+            } else {
+                lancement1();
+                menu();
+                choix1(jeu, option);
+                choix(option);
 
-            seconds = tempsLimite - (int)elapsed_time;
-            printf("\rTemps restant : %d secondes   ", seconds);
-            fflush(stdout);
+            }
         }
     }
-}
+            else
+            {
+            printf("Mot de passe incorrect. Retour au menu principal.\n");
+            choix(option);
+            }
+
+        }
+
