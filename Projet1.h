@@ -9,6 +9,8 @@
 #include <conio.h>
 #include <stdlib.h>
 #include <windows.h>
+#include "time.h"
+
 
 #define LIGNES_PLATEAU 10
 #define COLONNES_PLATEAU 20
@@ -21,6 +23,9 @@ typedef struct monJEU{
     char plateau[LIGNES_PLATEAU][COLONNES_PLATEAU];
     int oiseau ;
     int point ;
+    int niveau;
+    int Mot_De_Passe;
+  int scores[];
 }JEU;
 
 
@@ -29,7 +34,13 @@ typedef struct monJEU{
 int choix(int option);
 void Color(int couleurDuTexte,int couleurDeFond);
 void initialisation_plateau( JEU *jeu);
+void sauvegarde_plateau(JEU *jeu,const char *JeuSnoopy);
+int chargement_du_plateau (JEU *jeu, const char *JeuSnoopy);
 void affichage_plateau( JEU *jeu);
 void deplacement ( JEU *jeu, int deplacement_x, int deplacement_y);
+
+void MotsDePasses(JEU *jeu, char* MDP);
+void lancement();
+void lancement1();
 
 #endif //ING1_2023_2024_11_5_PROJET1_H
