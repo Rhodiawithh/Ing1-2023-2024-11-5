@@ -4,6 +4,7 @@
 #include "Projet1.h"
 
 int T=120;
+int TRestant = 120;
 int option;
 int niveau;
 int vies = 3;
@@ -42,6 +43,7 @@ int choix(int option) {
 }
 int choix1(JEU* jeu, int niveau)
 {
+    double elapsed_time = 0;
     while(1) {
         int CHOIX, a;
         a = 0;
@@ -52,20 +54,24 @@ int choix1(JEU* jeu, int niveau)
         }
         else if (CHOIX == 2)
         {
-            initialisation_plateau(&jeu);
-            char MDP[20];
-            scanf("%s", MDP);
-            MotsDePasses(MDP, 1);
-            lancerPartie1(&jeu);
-        }
-        else if (CHOIX == 3)
-        {
             int niveau = ChargerNiveau1();
             char MDP[20];
             MotsDePasses(MDP, niveau);
             initialisation_plateau(&jeu);
             lancerPartie1(&jeu);
-            SCORES(&jeu, niveau);
+            SCORES(&jeu, niveau, elapsed_time);
+        }
+        else if (CHOIX == 3)
+        {
+            //ici demander si veut niveau 1 ou si veux niveau 2
+            //si niveau 1
+            int niveau = ChargerNiveau1();
+            char MDP[20];
+            MotsDePasses(MDP, niveau);
+            initialisation_plateau(&jeu);
+            lancerPartie1(&jeu);
+            SCORES(&jeu, niveau, elapsed_time);
+            //si niveau 2
 
 
         }
@@ -76,7 +82,7 @@ int choix1(JEU* jeu, int niveau)
         }
         else if (CHOIX == 5)
         {
-            SCORES(jeu, niveau);
+            SCORES(&jeu, niveau, elapsed_time);
         }
 
     }
@@ -85,12 +91,10 @@ int choix1(JEU* jeu, int niveau)
 void clearreen() {
     system("cls");
 }
-
 void Color(int couleurDuTexte, int couleurDeFond) {
     HANDLE H = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleTextAttribute(H, couleurDeFond * 16 + couleurDuTexte);
 }
-
 int ChargerNiveau1() {
     int niveau = 1;
     FILE* fichier = fopen("sauvegarde.txt", "r");
@@ -109,12 +113,10 @@ int ChargerNiveau2() {
     }
     return niveau;
 }
-
 int quitter(int) {
     printf("Au Revoir :)\n");
     return 0;
 }
-
 int verificationMotDePasse(char* MDP, int niveau) {
     switch (niveau) {
         case 1:
@@ -127,7 +129,6 @@ int verificationMotDePasse(char* MDP, int niveau) {
             return 0;
     }
 }
-
 void MotsDePasses(char* MDP, int niveau) {
     int attempts = 3;
     int isPasswordCorrect = 0;
@@ -154,24 +155,32 @@ void MotsDePasses(char* MDP, int niveau) {
         }
     }
 }
-
-int TRestant = 120;
 void sauvegarderTempsRestant(int temps) {
     TRestant = temps;
 }
-
-void SCORES(JEU* jeu, int niveau) {
-    sauvegarderTempsRestant(TRestant);
-    int ScoreNiveau = TRestant * 100;
-    jeu->scores[niveau - 1] = ScoreNiveau;  //faire score avec structure c'est beaucoup plus simple et ca fonctionne.
-
+int calculerScoreTotal(JEU* jeu)
+{
     int ScoreTotal = 0;
-    for (int i = 0; i < MAX_SCORES; ++i) {
-        ScoreTotal += jeu->scores[i];//(le score total += au score du niveau)
+    for (int i = 0; i < MAX_SCORES; ++i)
+    {
+        ScoreTotal += jeu->scores[i];
     }
-
+    return ScoreTotal;
+}
+void SCORES(JEU* jeu, int niveau, double elapsed_time) //Calcul score +affichage
+{
+    int tempsLimite = 120;  // Temps limite en secondes
+    int tempsRestant = tempsLimite - (int)elapsed_time;
+    // Calcul du score du niveau en fonction du temps restant
+    int ScoreNiveau = tempsRestant * 100;
+    // Ajout du score du niveau au total
+    jeu->scores[niveau - 1] += ScoreNiveau;
+    // Affichage du score du niveau
     printf("Score du niveau %d : %d\n", niveau, ScoreNiveau);
-    printf("Score total : %d\n", ScoreTotal);
+    // Calcul du score total en appelant la fonction séparée
+   // int ScoreTotal = calculerScoreTotal(jeu);
+    // Affichage du score total
+   // printf("Score total : %d\n", ScoreTotal);
 }
 void sauvegarderMeilleursScores(JEU* jeu, int niveau) {
     FILE* fichier = fopen("meilleurs_scores.txt", "a");
@@ -180,7 +189,6 @@ void sauvegarderMeilleursScores(JEU* jeu, int niveau) {
         fclose(fichier);
     }
 }
-
 void chargerMeilleursScores(JEU* jeu) {
     FILE* fichier = fopen("meilleurs_scores.txt", "r");
     if (fichier != NULL) {
@@ -191,13 +199,18 @@ void chargerMeilleursScores(JEU* jeu) {
         fclose(fichier);
     }
 }
-void chronometre(int tempsLimite) {
-    for (int seconds = tempsLimite; seconds >= 0; seconds--) {
+void chronometre(int seconds) {
+    sauvegarderTempsRestant(TRestant);
+    for (seconds = TRestant; seconds >= 0; seconds--) {
         printf("\rTemps restant : %d secondes   ", seconds);
         fflush(stdout);
         Sleep(1000);
     }
     printf("\nDEATH\n");
+}
+double elapsed_time = 0;
+void afficherTempsRestant(int tempsRestant) {
+    printf("Temps restant : %d secondes", tempsRestant);
 }
 void initialisation_plateau(JEU* jeu) {
     int i, j;
@@ -222,7 +235,6 @@ void initialisation_plateau(JEU* jeu) {
         }
     }
 }
-
 void affichage_plateau(JEU* jeu) {
     for (int i = 0; i < LIGNES_PLATEAU; i++) {
         for (int j = 0; j < COLONNES_PLATEAU; j++) {
@@ -231,7 +243,6 @@ void affichage_plateau(JEU* jeu) {
         printf("\n");
     }
 }
-
 void deplacement(JEU* jeu, int deplacement_x, int deplacement_y) {
     int x = jeu->snoopy_x + deplacement_x;
     int y = jeu->snoopy_y + deplacement_y;
@@ -314,28 +325,29 @@ void lancement1()
         }
     }
 }
-void lancerPartie1(JEU* jeu)
-{
+
+
+void lancerPartie1(JEU* jeu) {
     int niveau = ChargerNiveau1();
     clock_t start_time = clock();
-    int tempsLimite = 120;  // Temps limite en secondes
-    int vies = 3;  // Nombre initial de vies
-    lancement();
+    int tempsLimite = 120;
+    int vies = 3;
+
+    lancement1();
 
     affichage_plateau(jeu);
     fflush(stdout);
     printf("\nLe jeu commence!\n");
 
     while (1) {
-        // ... (votre code pour la boucle de jeu)
+        int seconds;
 
         while (1) {
-
-            // Gestion des mouvements
             char mvmt = getch();
             int deplacement_x = 0, deplacement_y = 0;
 
-            switch (mvmt) {
+            switch (mvmt)
+            {
                 case 's':
                     deplacement_x = 0;
                     deplacement_y = -1;
@@ -354,62 +366,61 @@ void lancerPartie1(JEU* jeu)
                     break;
                 case 'l':
                     printf("Vous avez quitté le jeu\n");
-                    SCORES(jeu, niveau); // Affichage des scores
+                    SCORES(&jeu, niveau, elapsed_time); // Affichage des scores
                     return;
             }
 
-            // Déplace le snoopy et vérifie les collisions
             deplacement(jeu, deplacement_x, deplacement_y);
 
-            // Gestion des objets collectables (oiseaux)
             if (jeu->plateau[jeu->snoopy_x][jeu->snoopy_y] == OISEAU) {
                 jeu->oiseau--;
                 if (jeu->oiseau == 0) {
                     jeu->point = 1;
                     printf("Vous avez collecté tous les oiseaux! Vous passez au niveau suivant.\n");
-                    // Code pour passer au niveau suivant, mettre à jour les scores, etc.
+                    clock_t current_time = clock();
+                    double elapsed_time = (double)(current_time - start_time) / CLOCKS_PER_SEC;
+                    int ScoreNiveau = tempsLimite - (int)elapsed_time * 100;
+                    jeu->scores[niveau - 1] = ScoreNiveau;
+                    // Affichage des scores
+                    SCORES(jeu, niveau, elapsed_time);
+                    // Sauvegarde des meilleurs scores
+                    sauvegarderMeilleursScores(jeu, niveau);
+
+                    break;
                 }
             }
 
-            // Gestion des collisions avec d'autres éléments (ennemis, bords du plateau, etc.)
-            //if (jeu->plateau[jeu->snoopy_x][jeu->snoopy_y] == ENNEMI) {
-            // VIES();  // Le joueur perd une vie en cas de collision avec un ennemi
-            //  printf("Attention! Vous avez été touché par un ennemi. Il vous reste %d vies.\n", vies);
-            //   }
-
-            // Mise à jour de l'affichage après les déplacements et collisions
             affichage_plateau(jeu);
             fflush(stdout);
 
-            // Vérification de la condition de victoire
-            if (jeu->point == 1)
+            if (jeu->point == 1) //si tous les oiseaux récupérés
             {
                 printf("Victoire! Vous passez au niveau suivant.\n");
-                sauvegarderTempsRestant(T);
-                SCORES(jeu, niveau);  // Affichage des scores
-                // Code pour passer au niveau suivant, mettre à jour les scores, etc.
+                clock_t current_time = clock();
+                double elapsed_time = (double)(current_time - start_time) / CLOCKS_PER_SEC;
+                int ScoreNiveau = tempsLimite - (int)elapsed_time * 100;
+                jeu->scores[niveau - 1] = ScoreNiveau;
+                // Affichage des scores
+                SCORES(jeu, niveau, elapsed_time);
+                // Sauvegarde des meilleurs scores
+                sauvegarderMeilleursScores(jeu, niveau);
                 break;
             }
-            //start_time = clock();
-            //chronometre(tempsLimite);
 
-            // Vérification de la condition de défaite (temps écoulé > 120 secondes)
-            clock_t current_time = clock();//modify all this shit
+            clock_t current_time = clock();
             double elapsed_time = (double)(current_time - start_time) / CLOCKS_PER_SEC;
 
-            if (elapsed_time > tempsLimite)
+            if (elapsed_time > tempsLimite) //Si temps écoulé--> game over
             {
                 VIES(jeu);
                 lancement();
                 start_time = clock();
-                //start_time = clock();
                 break;
             }
 
-            // Affichage du temps écoulé
-            printf("\rTemps ecoule : %.2f secondes", elapsed_time);
+            seconds = tempsLimite - (int)elapsed_time;
+            printf("\rTemps restant : %d secondes   ", seconds);
             fflush(stdout);
         }
     }
-
 }
