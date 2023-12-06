@@ -8,6 +8,55 @@ int niveau;
 int vies = 3;
 double elapsed_time = 0;
 
+void sauvegarderMeilleursScores(JEU* jeu, int niveau) {
+    FILE* fichier = fopen("SCORES.txt", "a");
+    if (fichier != NULL) {
+        fprintf(fichier, "%d %d\n", niveau, jeu->scores[niveau - 1]);
+        fclose(fichier);
+    }
+}
+int calculerScoreTotal(JEU* jeu)
+{
+    int ScoreTotal = 0;
+    for (int i = 0; i < MAX_SCORES; ++i)
+    {
+        ScoreTotal = jeu->scores[i];
+    }
+    return ScoreTotal;
+}
+void chargerMeilleursScores(JEU* jeu)
+{
+    SCORES(&jeu, 1, elapsed_time);
+    SCORES(&jeu, 2, elapsed_time);
+}
+void SCORES(JEU* jeu, int niveau, double elapsed_time) {
+    int tempsLimite = 120;
+    int ScoreNiveau=0;
+
+    // Adjust scoring calculation based on the level
+    if (niveau == 1)
+    {
+        ScoreNiveau = (tempsLimite - (int)elapsed_time) * 100;
+    }
+    else if (niveau == 2)
+    {
+        ScoreNiveau = (tempsLimite - (int)elapsed_time) * 100;
+    }
+    else
+    {
+        ScoreNiveau = 0;
+    }
+
+    jeu->scores[niveau - 1] += ScoreNiveau;
+
+    printf("Score du niveau %d : %d\n", niveau, ScoreNiveau);
+    //printf("Scores enregistres :\n");
+    //for (int i = 0; i < MAX_SCORES; ++i) {
+     //   printf("Niveau %d : %d\n", i + 1, jeu->scores[i]);
+   // }
+    int ScoreTotal = calculerScoreTotal(jeu);
+    printf("Score total : %d\n", ScoreTotal);
+}
 void menu()
 {
 
@@ -37,7 +86,7 @@ void menu()
 
 }
 int choix(int option) {
-    printf("Tapez un entier entre 1 et 5 : ");
+    printf("Tapez un entier entre 1 et 6 : ");
     scanf("%d", &option);
     return option;
 }
@@ -57,38 +106,54 @@ int choix1(JEU* jeu, int niveau)
             int niveau = ChargerNiveau1();
             initialisation_plateau(&jeu);
             lancerPartie1(&jeu);
-            SCORES(&jeu, niveau, elapsed_time);
+            SCORES(&jeu, 1, elapsed_time);
         }
         else if (CHOIX == 3)
         {
-            //ici demander si veut niveau 1 ou si veux niveau 2
-            //si niveau 1
-            int niveau = ChargerNiveau1();
-            char MDP[20];
-            MotsDePasses(MDP, niveau);
-            initialisation_plateau(&jeu);
-            lancerPartie1(&jeu);
-            SCORES(&jeu, niveau, elapsed_time);
-            //si niveau 2
+            printf("Voulez-vous charger le niveau 1 ou niveau 2 ?\n");
+            printf("1. Niveau1\n");
+            printf("2. Niveau2\n");
+            int choixNiveau;
+            scanf("%d", &choixNiveau);
 
-
+            if (choixNiveau == 1) {
+                int niveau = ChargerNiveau1();
+                initialisation_plateau(&jeu);
+                lancerPartie1(&jeu);
+                SCORES(&jeu, 1, elapsed_time);
+            } else if (choixNiveau == 2) {
+                int niveau = ChargerNiveau2();
+                initialisation_plateau2(&jeu);
+                lancerPartie2(&jeu);
+                SCORES(&jeu, 2, elapsed_time);
+            } else {
+                printf("Choix invalide. Veuillez choisir 1 ou 2.\n");
+            }
         }
         else if (CHOIX == 6)
         {
-            int n = quitter(n);
             return 0;
         }
         else if (CHOIX == 5)
         {
-            SCORES(&jeu, niveau, elapsed_time);
+            chargerMeilleursScores(jeu);
+            printf("Scores enregistres :\n");
+            for (int i = 0; i < MAX_SCORES; ++i) {
+                printf("Niveau %d : %d\n", i + 1, jeu->scores[i]);
+            }
+
+            // Calculer et afficher le score total
+            int ScoreTotal = calculerScoreTotal(jeu);
+            printf("Score total : %d\n", ScoreTotal);
         }
         else if (CHOIX == 4)
         {
-            printf("Touches du jeu:-Appuyer 'D' pour aller en bas;"
-                                         "-Appuyer 'Q' pour ller en Haut;"
-                                         "-Appuyer 'S' pour aller a gauche;"
-                                         "-Appuyer 'Z' pour aller a droite;"
-                                         "-Appuyer 'P' a tout moment pour mettre pause                                                      ");
+            printf("Touches du jeu:\n"
+                   "-Appuyer 'D' pour aller en bas;\n"
+                   "-Appuyer 'Q' pour aller en Haut;\n"
+                   "-Appuyer 'S' pour aller a gauche;\n"
+                   "-Appuyer 'Z' pour aller a droite;\n"
+                   "-Appuyer 'P' a tout moment pour mettre pause                                                      ");
         }
 
     }
@@ -111,10 +176,6 @@ int ChargerNiveau2() {
         fclose(fichier);
     }
     return niveau;
-}
-int quitter(int) {
-    printf("Au Revoir :)\n");
-    return 0;
 }
 int verificationMotDePasse(char* MDP, int niveau) {
     switch (niveau) {
@@ -156,47 +217,6 @@ void MotsDePasses(char* MDP, int niveau) {
 }
 void sauvegarderTempsRestant(int temps) {
     TRestant = temps;
-}
-int calculerScoreTotal(JEU* jeu)
-{
-    int ScoreTotal = 0;
-    for (int i = 0; i < MAX_SCORES; ++i)
-    {
-        ScoreTotal += jeu->scores[i];
-    }
-    return ScoreTotal;
-}
-void SCORES(JEU* jeu, int niveau, double elapsed_time) //Calcul score +affichage
-{
-    int tempsLimite = 120;  // Temps limite en secondes
-    int tempsRestant = tempsLimite - (int)elapsed_time;
-    // Calcul du score du niveau en fonction du temps restant
-    int ScoreNiveau = tempsRestant * 100;
-    // Ajout du score du niveau au total
-    jeu->scores[niveau - 1] += ScoreNiveau;
-    // Affichage du score du niveau
-    printf("Score du niveau %d : %d\n", niveau, ScoreNiveau);
-    // Calcul du score total en appelant la fonction séparée
-   // int ScoreTotal = calculerScoreTotal(jeu);
-    // Affichage du score total
-   // printf("Score total : %d\n", ScoreTotal);
-}
-void sauvegarderMeilleursScores(JEU* jeu, int niveau) {
-    FILE* fichier = fopen("meilleurs_scores.txt", "a");
-    if (fichier != NULL) {
-        fprintf(fichier, "%d %d\n", niveau, jeu->scores[niveau - 1]);
-        fclose(fichier);
-    }
-}
-void chargerMeilleursScores(JEU* jeu) {
-    FILE* fichier = fopen("meilleurs_scores.txt", "r");
-    if (fichier != NULL) {
-        int niveau, score;
-        while (fscanf(fichier, "%d %d", &niveau, &score) == 2) {
-            jeu->scores[niveau - 1] = score;
-        }
-        fclose(fichier);
-    }
 }
 void afficherTempsRestant(int tempsRestant) {
     printf("Temps restant : %d secondes", tempsRestant);
@@ -355,6 +375,59 @@ void affichage_plateau(JEU* jeu) {
         printf("\n");
     }
 }
+void sauvegarde_plateau(JEU *jeu,const char *JeuSnoopy) {
+//ecriture dans le fichier parent
+    FILE *pf = fopen("../JeuSnoopy.txt", "w");
+
+    if (pf == NULL) {
+        perror("Erreur d'ouverture de fichier.");
+        return;
+    }
+    fprintf(pf, "%d %d %d %d\n", jeu->snoopy_x, jeu->snoopy_y, jeu->oiseau, jeu->point);
+
+    for (int i = 0; i < LIGNES_PLATEAU; i++) {
+        for (int j = 0; j < COLONNES_PLATEAU; j++) {
+            int Nombre;
+            if (jeu->plateau[i][j] == SNOOPY) {
+                Nombre = 4;
+            } else if (jeu->plateau[i][j] == OISEAU) {
+                Nombre = 6;
+            } else {
+                Nombre = 0;
+            }
+            fprintf(pf, "%d", Nombre);
+
+        }
+        fprintf(pf, "\n");
+
+    }
+    fclose(pf);
+}
+int chargement_du_plateau (JEU *jeu, const char *JeuSnoopy){
+    FILE *pf = fopen ("JeuSnoopy.txt","r");
+
+    if (pf == NULL){
+        perror("fichier non ouvrable");
+        return 0;
+    }
+
+    fscanf(pf, "%d %d %d %d", &jeu->snoopy_x, &jeu->snoopy_y, &jeu->oiseau, &jeu->point);
+
+    for (int i = 0; i < LIGNES_PLATEAU; i++) {
+        for (int j = 0; j < COLONNES_PLATEAU; j++) {
+            int Nombre;
+            fscanf(pf, "%d", &Nombre);
+            if ( Nombre == 4) {
+                jeu->plateau[i][j] = SNOOPY;
+            } else if (  Nombre = 6) {
+                jeu->plateau[i][j] = OISEAU;
+            } else {
+                jeu->plateau[i][j] = 0;
+            }
+        }}
+    fclose(pf);
+    return 1;
+}
 void reinitialiserPositionSnoopy(JEU* jeu) {
     jeu->plateau[jeu->snoopy_x][jeu->snoopy_y] = 0x0;
     jeu->snoopy_x = LIGNES_PLATEAU / 2;
@@ -427,11 +500,10 @@ void lancerPartie2(JEU* jeu)
     MotsDePasses(jeu->motDePasse, 2);
     if (verificationMotDePasse(jeu->motDePasse, 2))
     {
-        lancement();
-        affichage_plateau(jeu);
         fflush(stdout);
         printf("\nLe jeu commence!\n");
         lancement();
+        double elapsed_time = 0;
 
         while (1) {
             int seconds;
@@ -458,8 +530,8 @@ void lancerPartie2(JEU* jeu)
                         deplacement_y = 0;
                         break;
                     case 'l':
-                        printf("Vous avez quitté le jeu\n");
-                        SCORES(jeu, 2, elapsed_time); // 2 pour le deuxième niveau
+                        printf("Vous avez quitte le jeu\n");
+                        SCORES(&jeu, 2, elapsed_time);
                         return;
                 }
 
@@ -468,13 +540,13 @@ void lancerPartie2(JEU* jeu)
                     jeu->oiseau--;
                     if (jeu->oiseau == 0) {
                         jeu->point = 1;
-                        printf("Vous avez collecté tous les oiseaux! Vous passez au niveau suivant.\n");
+                        printf("Vous avez collecte tous les oiseaux! Vous passez au niveau suivant.\n");
                         clock_t current_time = clock();
                         double elapsed_time = (double) (current_time - start_time) / CLOCKS_PER_SEC;
                         int ScoreNiveau = tempsLimite - (int) elapsed_time * 100;
                         jeu->scores[niveau - 1] = ScoreNiveau;
                         // Affichage des scores
-                        SCORES(jeu, niveau, elapsed_time);
+                        SCORES(&jeu, 2, elapsed_time);
                         // Sauvegarde des meilleurs scores
                         sauvegarderMeilleursScores(jeu, niveau);
 
@@ -483,6 +555,8 @@ void lancerPartie2(JEU* jeu)
                 }
 
                 affichage_plateau(jeu);
+                sauvegarde_plateau(&jeu,"JeuSnoopy.text");
+                chargement_du_plateau (&jeu, "JeuSnoopy.text");
                 fflush(stdout);
 
                 if (jeu->point == 1) //si tous les oiseaux récupérés
@@ -493,7 +567,7 @@ void lancerPartie2(JEU* jeu)
                     int ScoreNiveau = tempsLimite - (int) elapsed_time * 100;
                     jeu->scores[1] = ScoreNiveau; // Mise à jour du score du deuxième niveau
                     // Affichage des scores
-                    SCORES(jeu, 2, elapsed_time);
+                    SCORES(&jeu, 2, elapsed_time);
                     // Sauvegarde des meilleurs scores
                     sauvegarderMeilleursScores(jeu, 2);
                     printf("Que souhaitez vous faire\n");
@@ -509,9 +583,13 @@ void lancerPartie2(JEU* jeu)
                     } else if (choi == 1)
                     {
                         lancement1();
-                        menu();
-                        choix1(jeu, option);
-                        choix(option);
+                        while(1) {
+                            int option=1;
+                            menu();
+                            choix(option);
+                            choix1(jeu, option);
+
+                        }
                         break;
                     } else {
                         printf("Choix invalide. Veuillez choisir 1 ou 2.\n");
@@ -556,6 +634,7 @@ void lancerPartie1(JEU *jeu)
         affichage_plateau(jeu);
         fflush(stdout);
         printf("\nLe jeu commence!\n");
+        double elapsed_time = 0;
 
         while (1) {
             int seconds;
@@ -583,14 +662,11 @@ void lancerPartie1(JEU *jeu)
                         break;
                     case 'l':
                         printf("Vous avez quitté le jeu\n");
-                        SCORES(&jeu, niveau, elapsed_time); // Affichage des scores
+                        SCORES(&jeu, 1, elapsed_time); // Affichage des scores
                         return;
                 }
 
                 deplacement(jeu, deplacement_x, deplacement_y);
-////////////////////////////////////////////////////////////////////////////////////////////
-
-
                 if (jeu->plateau[jeu->snoopy_x][jeu->snoopy_y] == OISEAU) {
                     jeu->oiseau--;
                     if (jeu->oiseau == 0) {
@@ -601,7 +677,7 @@ void lancerPartie1(JEU *jeu)
                         int ScoreNiveau = tempsLimite - (int) elapsed_time * 100;
                         jeu->scores[niveau - 1] = ScoreNiveau;
                         // Affichage des scores
-                        SCORES(jeu, niveau, elapsed_time);
+                        SCORES(&jeu, 1, elapsed_time);
                         // Sauvegarde des meilleurs scores
                         sauvegarderMeilleursScores(jeu, niveau);
 
@@ -610,6 +686,8 @@ void lancerPartie1(JEU *jeu)
                 }
 
                 affichage_plateau(jeu);
+                sauvegarde_plateau(&jeu,"JeuSnoopy.text");
+                chargement_du_plateau (&jeu, "JeuSnoopy.text");
                 fflush(stdout);
 
                 if (jeu->point == 1) //si tous les oiseaux récupérés
@@ -620,7 +698,7 @@ void lancerPartie1(JEU *jeu)
                     int ScoreNiveau = tempsLimite - (int) elapsed_time * 100;
                     jeu->scores[niveau - 1] = ScoreNiveau;
                     // Affichage des scores
-                    SCORES(jeu, niveau, elapsed_time);
+                    SCORES(&jeu, 1, elapsed_time);
                     // Sauvegarde des meilleurs scores
                     sauvegarderMeilleursScores(jeu, niveau);
                     printf("Que souhaitez vous faire\n");
@@ -634,9 +712,13 @@ void lancerPartie1(JEU *jeu)
                         break;
                     } else if (choi == 1) {
                         lancement1();
-                        menu();
-                        choix1(jeu, option);
-                        choix(option);
+                        while(1) {
+                            int option=1;
+                            menu();
+                            choix(option);
+                            choix1(jeu, option);
+
+                        }
                         break; // Retourner au menu principal
                     } else {
                         printf("Choix invalide. Veuillez choisir 1 ou 2.\n");
